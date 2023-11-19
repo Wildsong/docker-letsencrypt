@@ -5,7 +5,7 @@
 # Run it once a week to renew certs before they expire
 
 source .env
-docker run --rm -p 80:80 -v $PWD/certs:/etc/letsencrypt:rw certbot/certbot certonly \
+docker run --rm -p 80:80 -v certs:/etc/letsencrypt:rw certbot/certbot certonly \
        --dry-run \
        --cert-name ${CERTNAME} \
        --expand \

@@ -9,7 +9,7 @@
 # Add this in case some domains aren't working: --allow-subset-of-names
 
 source .env
-docker run --rm -v $PWD/certs:/etc/letsencrypt:rw cc/certbot \
+docker run --rm -v certs:/etc/letsencrypt:rw cc/certbot \
        certonly \
        --cert-name ${CERTNAME} \
        --expand \

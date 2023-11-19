@@ -2,7 +2,7 @@
 # This gets run from crontab to keep certificates up to date.
 
 source .env
-docker run --rm -v $PWD/certs:/etc/letsencrypt:rw cc/certbot certonly \
+docker run --rm -v certs:/etc/letsencrypt:rw cc/certbot certonly \
        --cert-name ${CERTNAME} \
        --expand \
        -d ${DOMAINS} -m ${EMAIL} \
