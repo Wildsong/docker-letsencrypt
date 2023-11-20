@@ -34,5 +34,5 @@ if (( ($now - $age) < (60 * 60) )); then
     docker stack rm varnish
     # give varnish_network time to disappear
     sleep 5
-    docker stack deploy --with-registry-auth -c compose.yaml varnish 
+    docker stack deploy --with-registry-auth -c $HOME/docker/varnish/compose.yaml varnish 
 fi

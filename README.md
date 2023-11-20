@@ -85,11 +85,8 @@ Found the following certs:
 
 I just accidentally deleted certs/hitch-bundle.pem, oops. I recreated it, like this
 
-```bash
-docker run --rm -v certs:/etc/letsencrypt debian
-cd /etc/letsencrypt/live/wildsong.biz
-cat privkey.com fullchain.pem ../../dhparams.pem > ../../hitch-bundle.pem
-```
+  ./build_hitch_bundle.sh
+
 
 TODO - If I was really diligent I'd script something to create the
 hitch.conf file from that output.
