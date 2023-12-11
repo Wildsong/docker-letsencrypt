@@ -1,14 +1,14 @@
 # docker-letsencrypt
 
-This project was split off from docker-varnish, because
-I need certificates for more than just web sites now. For
-example, for my mail server.
-
 This project runs from scripts and the Docker containers are
 short-lived. They check on and renew certs and then exit.
 
 There are options here for "DNS Made Easy", "Cloudflare", and nothing,
 which uses a local web server that's part of certbot.  
+
+This project was split off from docker-varnish, because
+I need certificates for more than just web sites now. For
+example, for my mail server.
 
 ## Prerequisites
 
