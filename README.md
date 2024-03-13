@@ -20,6 +20,18 @@ This project is set up to support it, but since it's running the
 Let's Encrypt certbot behind the scenes it can be used for other apps
 as well.
 
+You need to have a dhparams.pem file. It will be baked into the
+certbot images; the deploy hook script will copy dhparams.pem into the
+certificate bundle.  You should only have to create the dhparams.pem
+file one time, then add to your certs volume so that containers get
+get to it.
+
+You need openssl, and you need to be able to copy the file into a volume.
+
+   openssl dhparam 2048 > dhparams.pem
+   docker run -it -v certs:/etc/letsencrypt -n certs debian
+   docker cp dhparam.pem certs:/etc/letsencrypt
+
 ## Build certbot and create certificates
 
 Build the correct Certbot image for your configuration. I use
@@ -29,14 +41,14 @@ not send it to a public registry.**
 Using DNSMadeEasy
    docker buildx build -f Dockerfile.dnsmadeeasy -t cc/certbot .
    docker run --rm cc/certbot --version
-   ./run_certbot.sh
+   ./run_dnsmadeeasy_certbot.sh certbot.sh
 
 ELSE use Cloudflare API
    docker buildx build -f Dockerfile.cloudflare -t cc/certbot .
    docker run --rm cc/certbot --version
    ./run_cloudflare_certbot.sh
 
-ELSE use the challenge server, uses a generic image so no build here.
+ELSE use the challenge server
     ./run_certbot.sh
     
 ## Note on combined "expanded" certificates
@@ -48,22 +60,15 @@ I found the "--expand" option, which takes the full list of names and
 returns one certificate that works for all of them. This made life
 easier.
 
-If you have a reason to pull many certificates instead of just the one,
-remove the '--expand' option in cerbot.yaml.
-
 My .env file has this line:
 
-DOMAINS="echo.clatsopcounty.gov,echo.co.clatsop.or.us,giscache.clatsopcounty.gov,giscache.co.clatsop.or.us
+DOMAINS="echo.clatsopcounty.gov,echo.co.clatsop.or.us,giscache.clatsopcounty.gov,giscache.co.clatsop.or.us"
 
-I have a line CERTNAME that is used for the name of the folder they will be stored in.
-By default it would be the first, but that was clunky. So now there is a setting.
-
-CERTNAME=mycertificatebundle
-
-Run "check_certificates" ti see what you have,
+Because "echo" is listed first, the live certificate will be listed under that name and
+all the other names will be included. List all certifcates and see for yourself what you have.
 
 ```bash
-./check_certs.sh
+docker run --rm -v certs:/etc/letsencrypt cc/certbot certificates
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,17 +83,13 @@ Found the following certs:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-## Hitch bundle file
-
-I just accidentally deleted certs/hitch-bundle.pem, oops. Varnish stopped working. Woe is me!
-
-Use this script to build the bundle.
+I just accidentally deleted certs/hitch-bundle.pem, oops. I recreated it, like this
 
   ./build_hitch_bundle.sh
 
-## Maintenance
 
-### Dispose of old certificates
+TODO - If I was really diligent I'd script something to create the
+hitch.conf file from that output.
 
 Currently there are still some old certificate directories hanging
 around on my servers but you can see which ones are in use by using
@@ -96,6 +97,8 @@ the "certbot certificates" command. You can delete the others, then
 they will stop showing up in the output of the "certonly" command used
 to renew everything.
 
+If you have a reason to pull many certificates, remove the '--expand'
+option in cerbot.yaml.
 
 *At this point you should be ready to attempt to request some certificates.* (Or maybe just one, combined.)
 
@@ -105,7 +108,8 @@ to renew everything.
 
 DNSMadeEasy and Cloudflare do not need the challenge server,
 which means it can run fully isolated behind a firewall,
-but I can't always choose which DNS service is used.
+but I can't always choose which DNS
+service is used.
 
 ### What if I have existing certificates?
 
@@ -130,7 +134,6 @@ but don't do it more than once a day or you will get banned.
    # Renew certificates once a week
    23 4  * * 0  cd $HOME/docker/letsencrypt && ./run_certbot.sh
 
-See also the crontab entry in docker-varnish if you also use it.
 
 ## Resources
 
