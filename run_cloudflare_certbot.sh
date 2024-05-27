@@ -2,7 +2,7 @@
 # This gets run from crontab to keep certificates up to date.
 # Read options here https://eff-certbot.readthedocs.io/en/stable/using.html#configuration-file
 
-source .env
+source $HOME/docker/letsencrypt/.env
 
 function certbot () {
 
@@ -14,7 +14,7 @@ function certbot () {
     docker run --rm -v certs:/etc/letsencrypt:rw --network host cc/certbot \
        certonly \
        -v \
-       --cert-name certs \
+       --cert-name $CERTNAME \
        --expand \
        -d ${DOMAINS} \
        -m ${EMAIL} \
