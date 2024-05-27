@@ -6,7 +6,7 @@
 
 source .env
 docker run --rm -p 80:80 -v certs:/etc/letsencrypt:rw certbot/certbot certonly \
-       --cert-name ${CERTNAME} \
+       --cert-name certs \
        --expand \
        -d ${DOMAINS} -m ${EMAIL} \
        --agree-tos \

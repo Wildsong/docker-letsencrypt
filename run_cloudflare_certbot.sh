@@ -1,4 +1,4 @@
-#!/bin/bash
+(host='acme-staging-v02.api.letsencrypt.org', port=443)#!/bin/bash
 # This gets run from crontab to keep certificates up to date.
 # Read options here https://eff-certbot.readthedocs.io/en/stable/using.html#configuration-file
 
@@ -11,9 +11,10 @@ function certbot () {
     # --cert-name will add or remove names using the certificate as named
     # --expand will only add names to an existing cert
 
-    docker run --rm -v certs:/etc/letsencrypt:rw cc/certbot \
+    docker run --rm -v certs:/etc/letsencrypt:rw --network host cc/certbot \
        certonly \
-       --cert-name ${CERTNAME} \
+       -v \
+       --cert-name certs \
        --expand \
        -d ${DOMAINS} \
        -m ${EMAIL} \
@@ -23,9 +24,9 @@ function certbot () {
        --max-log-backups=0 \
        --dns-cloudflare --dns-cloudflare-credentials /usr/local/lib/cloudflare.ini \
        --dns-cloudflare-propagation-seconds=30 \
-       --noninteractive
-    # --dry-run
-    # --quiet
+       --noninteractive \
+
+       #--dry-run
 }
 
 function update_hitch () {
@@ -42,4 +43,5 @@ function update_hitch () {
 }
 
 certbot
+./build_hitch_bundle.sh
 update_hitch
