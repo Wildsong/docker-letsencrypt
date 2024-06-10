@@ -1,4 +1,4 @@
-(host='acme-staging-v02.api.letsencrypt.org', port=443)#!/bin/bash
+#!/bin/bash
 # This gets run from crontab to keep certificates up to date.
 # Read options here https://eff-certbot.readthedocs.io/en/stable/using.html#configuration-file
 
